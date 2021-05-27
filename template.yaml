@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  notifications
+
+  Sample SAM Template for notifications
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 512
+
+Resources:
+  NotificationAlarmTrigger:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: notifications/alarms
+      Handler: trigger.app.lambda_handler
+      Runtime: python3.8
+      Events:
+        AlarmCreatePostAPI:
+          Type: Api
+          Properties:
+            Path: '/alarms/trigger'
+            Method: POST
+            Auth:
+              Authorizer: NONE
+
+  NotificationAlarmRegister:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: notifications/alarms
+      Handler: register.app.lambda_handler
+      Runtime: python3.8
+      Events:
+        AlarmRegisterPostAPI:
+          Type: Api
+          Properties:
+            Path: '/alarms/register'
+            Method: POST
+            Auth:
+              Authorizer: NONE
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  HelloWorldFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn
+  HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt HelloWorldFunctionRole.Arn
